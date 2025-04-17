@@ -1,0 +1,34 @@
+###########################################################################
+### Verification Tasks                                                  ###
+###########################################################################
+
+- name: ETCD | Verify | Set etcd_client_endpoints list
+  set_fact:
+    etcd_client_endpoints: >-
+      [{% for host in groups['etcd_nodes'] -%}
+        "https://{{ hostvars[host].ansible_default_ipv4.address }}:{{ etcd_client_listen_port }}"{% if not loop.last %}, {% endif %}
+      {%- endfor %}]
+
+- name: ETCD | Verify | Debug etcd_client_endpoints
+  ansible.builtin.debug:
+    msg: "etcd_client_endpoints: {{ etcd_client_endpoints | join(',') }}"
+  when: etcd_client_endpoints is defined
+
+- name: ETCD | Verify | Cluster Health
+  ansible.builtin.command: >
+    {{ etcd_binary_dir }}/etcdctl
+    --endpoints={{ etcd_client_endpoints | join(',') }}
+    --cacert={{ etcd_pki_dir }}/ca.crt
+    --cert={{ etcd_pki_dir }}/server.crt
+    --key={{ etcd_pki_dir }}/server.key
+    endpoint health --cluster
+  register: etcd_cluster_health
+  changed_when: false
+  failed_when: "'unhealthy' in etcd_cluster_health.stdout or etcd_cluster_health.rc != 0"
+  environment:
+    ETCDCTL_API: "3"
+
+- name: ETCD | Verify | Cluster Health Output
+  ansible.builtin.debug:
+    msg: "Cluster health: {{ etcd_cluster_health.stdout }}"
+  when: etcd_cluster_health is defined

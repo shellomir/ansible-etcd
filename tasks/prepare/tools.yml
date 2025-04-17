@@ -1,0 +1,9 @@
+###########################################################################
+### Installing Tools Needed for Further Tasks                           ###
+###########################################################################
+
+- name: ETCD | Prepare | Install Required Tools [RPM]
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ etcd_required_tools }}"

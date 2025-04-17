@@ -1,0 +1,21 @@
+###########################################################################
+### Check if Server Certificates and Keys are Present                   ###
+###########################################################################
+
+- name: ETCD | Certificates | Server | Check | Cert file
+  ansible.builtin.stat:
+    path: "{{ etcd_pki_dir }}/server.crt"
+  register: server_cert_stat
+
+- name: ETCD | Certificates | Server | Check | Key file
+  ansible.builtin.stat:
+    path: "{{ etcd_pki_dir }}/server.key"
+  register: server_key_stat
+
+- name: ETCD | Certificates | Server | Check | Set Flag to Process Certs if Missing or Overwrite is Requested
+  ansible.builtin.set_fact:
+    _etcd_server_cert_process: >
+      {{
+        (not server_cert_stat.stat.exists or not server_key_stat.stat.exists)
+        or etcd_server_cert_overwrite
+      }}

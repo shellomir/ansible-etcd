@@ -1,0 +1,21 @@
+###########################################################################
+### Preparation Tasks                                                   ###
+###########################################################################
+
+- name: ETCD | Prepare | User & Group
+  ansible.builtin.import_tasks: prepare/user-and-group.yml
+  tags:
+    - etcd
+    - etcd_prepare
+
+- name: ETCD | Prepare | Directories
+  ansible.builtin.import_tasks: prepare/directories.yml
+  tags:
+    - etcd
+    - etcd_prepare
+
+- name: ETCD | Prepare | Tools
+  ansible.builtin.import_tasks: prepare/tools.yml
+  tags:
+    - etcd
+    - etcd_prepare

@@ -1,0 +1,32 @@
+###########################################################################
+### Upload CA Certificate                                               ###
+###########################################################################
+- name: ETCD | Certificates | CA | Assert CA certificate value
+  ansible.builtin.assert:
+    that:
+      - (hostvars['localhost'].etcd_ca_cert | default(etcd_ca_cert)) is defined
+    fail_msg: "No CA certificate value is defined. Please generate or provide a CA certificate."
+
+- name: ETCD | Certificates | CA | Assert CA private key value for generation
+  ansible.builtin.assert:
+    that:
+      - (hostvars['localhost'].etcd_ca_cert | default(etcd_ca_cert)) is defined
+    fail_msg: "No CA certificate private key is defined. Please generate or provide a CA certificate private key."
+  when: etcd_server_cert_generate
+
+- name: ETCD | Certificates | CA | Upload | User-provided Certificate
+  ansible.builtin.copy:
+    content: "{{ hostvars['localhost'].etcd_ca_cert | default(etcd_ca_cert) | b64decode }}"
+    dest: "{{ etcd_pki_dir }}/ca.crt"
+    mode: "0644"
+    owner: "{{ etcd_user }}"
+    group: "{{ etcd_group }}"
+
+- name: ETCD | Certificates | CA | Upload | User-provided Private Key
+  ansible.builtin.copy:
+    content: "{{ etcd_ca_private_key | b64decode }}"
+    dest: "{{ etcd_pki_dir }}/ca.key"
+    mode: "0600"
+    owner: "{{ etcd_user }}"
+    group: "{{ etcd_group }}"
+  when: etcd_server_cert_generate

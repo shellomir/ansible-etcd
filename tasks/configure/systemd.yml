@@ -1,0 +1,21 @@
+###########################################################################
+### Systemd Unit Configuration                                          ###
+###########################################################################
+
+- name: ETCD | Configure | Systemd | Render Unit File
+  ansible.builtin.template:
+    src: systemd-unit.j2
+    dest: /etc/systemd/system/etcd.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload Systemd Daemon
+    - Restart ETCD Systemd Unit
+
+- name: ETCD | Configure | Systemd | Start ETCD Service
+  ansible.builtin.systemd:
+    name: etcd
+    state: started
+    enabled: true
+  register: systemd_start_etcd

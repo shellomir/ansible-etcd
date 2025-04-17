@@ -1,0 +1,40 @@
+###########################################################################
+### Generate Server Certificates                                        ###
+###########################################################################
+
+- name: ETCD | Certificates | Server | Generate | Ensure Python cryptography library is installed
+  ansible.builtin.pip:
+    name: cryptography
+    state: present
+
+- name: ETCD | Certificates | Server | Generate | Private Key
+  community.crypto.openssl_privatekey:
+    path: "{{ etcd_pki_dir }}/server.key"
+    size: "{{ etcd_server_cert_key_size }}"
+    type: RSA
+
+- name: ETCD | Certificates | Server | Generate | CSR
+  community.crypto.openssl_csr:
+    path: "{{ etcd_pki_dir }}/server.csr"
+    privatekey_path: "{{ etcd_pki_dir }}/server.key"
+    common_name: "{{ etcd_server_cert_common_name }}"
+    country_name: "{{ etcd_server_cert_country }}"
+    organization_name: "{{ etcd_ca_cert_org }}"
+    organizational_unit_name: "{{ etcd_ca_cert_ou }}"
+    subject_alt_name: "{{ ['DNS:' ~ inventory_hostname, 'DNS:' ~ ansible_fqdn, 'IP:' ~ ansible_default_ipv4.address, 'IP:127.0.0.1'] | join(',') }}"
+
+- name: ETCD | Certificates | Server | Generate | Certificate
+  community.crypto.x509_certificate:
+    path: "{{ etcd_pki_dir }}/server.crt"
+    csr_path: "{{ etcd_pki_dir }}/server.csr"
+    ownca_privatekey_path: "{{ etcd_pki_dir }}/ca.key"
+    ownca_path: "{{ etcd_pki_dir }}/ca.crt"
+    provider: ownca
+    ownca_not_after: "+{{ etcd_server_cert_valid_days }}d"
+
+- name: ETCD | Certificates | Server | Generate | Set Ownership
+  ansible.builtin.file:
+    path: "{{ etcd_pki_dir }}"
+    owner: "{{ etcd_user }}"
+    group: "{{ etcd_group }}"
+    recurse: true

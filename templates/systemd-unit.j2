@@ -1,0 +1,63 @@
+###########################################################################
+### Ansible-Managed                                                     ###
+###########################################################################
+
+[Unit]
+Description=etcd key-value store
+Documentation=https://etcd.io/docs/
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+User={{ etcd_user }}
+Group={{ etcd_group }}
+ExecStart={{ etcd_binary_dir }}/etcd \
+  --config-file={{ etcd_config_dir }}/etcd.conf
+Restart=on-failure
+RestartSec=5
+{% if etcd_limit_nofile is defined %}
+LimitNOFILE={{ etcd_limit_nofile }}
+{% endif %}
+{% if etcd_limit_nproc is defined %}
+LimitNPROC={{ etcd_limit_nproc }}
+{% endif %}
+{% if etcd_limit_core is defined %}
+LimitCORE={{ etcd_limit_core }}
+{% endif %}
+{% if etcd_limit_memlock is defined %}
+LimitMEMLOCK={{ etcd_limit_memlock }}
+{% endif %}
+{% if etcd_limit_as is defined %}
+LimitAS={{ etcd_limit_as }}
+{% endif %}
+{% if etcd_limit_rss is defined %}
+LimitRSS={{ etcd_limit_rss }}
+{% endif %}
+{% if etcd_limit_stack is defined %}
+LimitSTACK={{ etcd_limit_stack }}
+{% endif %}
+{% if etcd_limit_cpu is defined %}
+LimitCPU={{ etcd_limit_cpu }}
+{% endif %}
+{% if etcd_limit_fsize is defined %}
+LimitFSIZE={{ etcd_limit_fsize }}
+{% endif %}
+{% if etcd_limit_sigpending is defined %}
+LimitSIGPENDING={{ etcd_limit_sigpending }}
+{% endif %}
+{% if etcd_limit_msgqueue is defined %}
+LimitMSGQUEUE={{ etcd_limit_msgqueue }}
+{% endif %}
+{% if etcd_limit_nice is defined %}
+LimitNICE={{ etcd_limit_nice }}
+{% endif %}
+{% if etcd_limit_rtprio is defined %}
+LimitRTPRIO={{ etcd_limit_rtprio }}
+{% endif %}
+{% if etcd_limit_rttime is defined %}
+LimitRTTIME={{ etcd_limit_rttime }}
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target

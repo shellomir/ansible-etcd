@@ -1,0 +1,56 @@
+###########################################################################
+### Generate CA Certificate                                             ###
+###########################################################################
+
+- name: ETCD | Certificates | CA | Generate | Ensure Python cryptography library is installed
+  ansible.builtin.pip:
+    name: cryptography
+    state: present
+
+- name: ETCD | Certificates | CA | Generate | Private Key
+  community.crypto.openssl_privatekey:
+    path: "{{ etcd_pki_dir }}/ca.key"
+    size: "{{ etcd_ca_cert_key_size }}"
+    type: RSA
+
+- name: ETCD | Certificates | CA | Generate | CSR
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ etcd_pki_dir }}/ca.key"
+    common_name: "{{ etcd_ca_cn }}"
+    country_name: "{{ etcd_ca_cert_country }}"
+    organization_name: "{{ etcd_ca_cert_org }}"
+    organizational_unit_name: "{{ etcd_ca_cert_ou }}"
+    use_common_name_for_san: false
+    basic_constraints:
+      - "CA:TRUE"
+    basic_constraints_critical: true
+    key_usage:
+      - keyCertSign
+    key_usage_critical: true
+  register: ca_csr
+
+- name: ETCD | Certificates | CA | Generate | Certificate
+  community.crypto.x509_certificate:
+    path: "{{ etcd_pki_dir }}/ca.crt"
+    csr_content: "{{ ca_csr.csr }}"
+    privatekey_path: "{{ etcd_pki_dir }}/ca.key"
+    provider: selfsigned
+
+- name: ETCD | Certificates | CA | Generate | Read Generated Cert into Variable
+  ansible.builtin.slurp:
+    src: "{{ etcd_pki_dir }}/ca.crt"
+  register: ca_cert_slurp
+
+- name: ETCD | Certificates | CA | Generate | Set Global Fact for Generated CA Cert
+  ansible.builtin.set_fact:
+    etcd_ca_cert: "{{ ca_cert_slurp.content }}"
+  run_once: true
+
+- name: ETCD | Certificates | CA | Generate | Read Generated Private Key into Variable
+  ansible.builtin.slurp:
+    src: "{{ etcd_pki_dir }}/ca.key"
+  register: ca_key_slurp
+
+- name: ETCD | Certificates | CA | Generate | Set Global Fact for Generated CA Private Key
+  ansible.builtin.set_fact:
+    etcd_ca_private_key: "{{ ca_key_slurp.content }}"

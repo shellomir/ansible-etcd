@@ -1,0 +1,182 @@
+etcd_version: "v3.5.19"
+
+etcd_user: etcd
+etcd_group: "{{ etcd_user }}"
+
+etcd_download_url: https://github.com/coreos/etcd/releases/download
+# Alternative download URL: https://storage.googleapis.com/etcd
+
+etcd_download_dir: "/tmp/etcd"
+
+etcd_required_tools:
+  - tar
+  - openssl
+
+### Directories ###########################################################
+etcd_binary_dir: /opt/etcd
+etcd_config_dir: /etc/etcd
+etcd_data_dir: /var/lib/etcd
+etcd_log_dir: /var/log/etcd
+etcd_pki_dir: /etc/etcd/pki
+etcd_wal_dir: "{{ etcd_data_dir }}/wal"
+
+### Certificates :: CA ####################################################
+
+# Generate CA certificate if it doesn't exist
+# If set to false, certificate must be provided via etcd_ca_cert variable
+# or already be present in the etcd_pki_dir
+etcd_ca_cert_generate: true
+# Overwrite CA certificate
+etcd_ca_cert_overwrite: false
+# Provide your own CA certificate and private key
+etcd_ca_cert: ""
+etcd_ca_private_key: ""
+
+# Attributes for generated CA certificate
+etcd_ca_cn: "etcd-ca"
+etcd_ca_cert_valid_days: 3650
+etcd_ca_cert_key_size: 4096
+etcd_ca_cert_country: "KG"
+etcd_ca_cert_org: "MyOrg"
+etcd_ca_cert_ou: "Etcd Cluster CA"
+etcd_ca_cert_common_name: "{{ inventory_hostname }}"
+etcd_ca_cert_alt_names:
+  - "{{ ansible_fqdn }}"
+  - "{{ ansible_host }}"
+
+### Certificates :: Server ################################################
+
+# Generate server certificate if it doesn't exist
+# If set to false, certificate must be provided via etcd_server_cert variable
+# or already be present in the etcd_pki_dir
+etcd_server_cert_generate: true
+# Overwrite server certificate
+etcd_server_cert_overwrite: false
+# Provide your own CA certificate and private key
+etcd_server_cert: ""
+etcd_server_private_key: ""
+
+# Attributes for generated CA certificate
+etcd_server_cert_valid_days: 3650
+etcd_server_cert_key_size: 4096
+etcd_server_cert_country: "KG"
+etcd_server_cert_org: "MyOrg"
+etcd_server_cert_ou: "Etcd Cluster"
+etcd_server_cert_common_name: "{{ inventory_hostname }}"
+etcd_server_cert_alt_names:
+  - "{{ ansible_fqdn }}"
+  - "{{ ansible_host }}"
+
+### etcd.conf #############################################################
+etcd_snapshot_count: 10000
+etcd_heartbeat_interval_ms: 100
+etcd_election_timeout_ms: 1000
+etcd_quota_backend_bytes: 0
+
+etcd_client_listen_port: 2379
+etcd_peering_listen_port: 2380
+etcd_listen_peer_urls: "https://{{ ansible_default_ipv4.address }}:{{ etcd_peering_listen_port }}"
+etcd_listen_client_urls: "https://{{ ansible_default_ipv4.address }}:{{ etcd_client_listen_port }},https://127.0.0.1:{{ etcd_client_listen_port }}"
+etcd_initial_advertise_peer_urls: "https://{{ ansible_default_ipv4.address }}:{{ etcd_peering_listen_port }}"
+etcd_initial_advertise_client_urls: "https://{{ ansible_default_ipv4.address }}:{{ etcd_client_listen_port }}"
+etcd_advertise_client_urls: "https://{{ ansible_default_ipv4.address }}:{{ etcd_client_listen_port }}"
+
+etcd_discovery_url: ""
+etcd_discovery_fallback: "proxy"
+etcd_discovery_proxy: ""
+etcd_discovery_srv: ""
+
+etcd_max_snapshots: 5
+
+etcd_max_wals: 5
+
+etcd_cors: ""
+
+etcd_strict_reconfig_check: false
+etcd_enable_pprof: true
+etcd_proxy_on_off: "off"
+etcd_proxy_failure_wait_ms: 5000
+etcd_proxy_refresh_interval_ms: 30000
+etcd_proxy_dial_timeout_ms: 1000
+etcd_proxy_write_timeout_ms: 5000
+etcd_proxy_read_timeout_ms: 0
+
+etcd_client_transport_cert_file: "{{ etcd_pki_dir }}/server.crt"
+etcd_client_transport_key_file: "{{ etcd_pki_dir }}/server.key"
+etcd_client_transport_cert_auth_enabled: true
+etcd_client_transport_auto_tls_enabled: false
+etcd_client_transport_ca_cert_file: "{{ etcd_pki_dir }}/ca.crt"
+etcd_allowed_cn_list: "{{ groups['etcd_nodes'] | default([]) }}"
+
+etcd_peer_transport_cert_file: "{{ etcd_pki_dir }}/server.crt"
+etcd_peer_transport_key_file: "{{ etcd_pki_dir }}/server.key"
+etcd_peer_transport_cert_auth_enabled: true
+etcd_peer_transport_auto_tls_enabled: false
+etcd_peer_transport_ca_cert_file: "{{ etcd_pki_dir }}/ca.crt"
+
+etcd_self_signed_cert_validity_years: 1
+
+etcd_initial_cluster_token: "etcd-cluster"
+etcd_initial_cluster_state: "new"
+
+etcd_force_new_cluster: false
+
+etcd_auto_compaction_mode: periodic
+etcd_auto_compaction_retention: "1"
+
+etcd_tls_min_version: "TLS1.2"
+etcd_tls_max_version: "TLS1.3"
+
+etcd_log_level: "info"
+etcd_logger: "zap"
+etcd_log_outputs:
+  - stderr
+
+etcd_cipher_suites:
+  - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+#
+#
+### Systemd Unit :: Resource Limits #######################################
+#
+# LimitNOFILE: max number of open files (ulimit -n)
+# etcd_limit_nofile: 65536
+
+# LimitNPROC: max number of processes/threads (ulimit -u)
+# etcd_limit_nproc: 4096
+
+# LimitCORE: max size of core files (ulimit -c)
+# etcd_limit_core: infinity
+
+# LimitMEMLOCK: max locked-in-memory address space
+# etcd_limit_memlock: infinity
+
+# LimitAS: max address space
+# etcd_limit_as: infinity
+
+# LimitRSS: max resident set size (RAM)
+# etcd_limit_rss: 1073741824  # 1 GiB
+
+# LimitSTACK: max stack size
+# etcd_limit_stack: 8388608  # 8 MiB
+
+# LimitCPU: max CPU time (in seconds)
+# etcd_limit_cpu: 300
+
+# LimitFSIZE: max file size
+# etcd_limit_fsize: infinity
+
+# LimitSIGPENDING: max number of pending signals
+# etcd_limit_sigpending: 1024
+
+# LimitMSGQUEUE: max size of POSIX message queues
+# etcd_limit_msgqueue: 819200
+
+# LimitNICE: max nice priority value
+# etcd_limit_nice: 0
+
+# LimitRTPRIO: max real-time priority
+# etcd_limit_rtprio: 99
+
+# LimitRTTIME: max real-time execution time (in microseconds)
+# etcd_limit_rttime: 1000000

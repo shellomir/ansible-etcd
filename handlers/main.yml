@@ -1,0 +1,8 @@
+- name: Reload Systemd Daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart ETCD Systemd Unit
+  ansible.builtin.systemd:
+    name: etcd
+    state: restarted

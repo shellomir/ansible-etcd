@@ -1,0 +1,37 @@
+###########################################################################
+### Generate or Upload Certificates                                     ###
+###########################################################################
+
+- name: ETCD | Certificates | CA | Check
+  ansible.builtin.import_tasks: certificates/ca_check.yml
+  when:
+    - inventory_hostname == (groups.get('etcd_nodes', []) | first)
+  run_once: true
+
+- name: ETCD | Certificates | CA | Generate
+  ansible.builtin.import_tasks: certificates/ca_generate.yml
+  when:
+    - inventory_hostname == (groups.get('etcd_nodes', []) | first)
+    - _etcd_ca_cert_process
+    - etcd_ca_cert_generate
+  run_once: true
+
+- name: ETCD | Certificates | CA | Upload
+  ansible.builtin.import_tasks: certificates/ca_upload.yml
+  when:
+    - _etcd_ca_cert_process
+
+- name: ETCD | Certificates | Server | Check
+  ansible.builtin.import_tasks: certificates/server_check.yml
+
+- name: ETCD | Certificates | Server | Generate
+  ansible.builtin.import_tasks: certificates/server_generate.yml
+  when:
+    - _etcd_server_cert_process
+    - etcd_server_cert_generate
+
+- name: ETCD | Certificates | Server | Upload
+  ansible.builtin.import_tasks: certificates/server_upload.yml
+  when:
+    - _etcd_server_cert_process
+    - not etcd_server_cert_generate

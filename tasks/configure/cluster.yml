@@ -1,0 +1,14 @@
+###########################################################################
+### ETCD Cluster Configuration                                          ###
+###########################################################################
+
+- name: ETCD | Configure | Cluster
+  ansible.builtin.template:
+    src: etcd.conf.j2
+    dest: "{{ etcd_config_dir }}/etcd.conf"
+    owner: "{{ etcd_user }}"
+    group: "{{ etcd_group }}"
+    mode: "0644"
+  tags:
+    - etcd_configure
+    - etcd_configure_cluster

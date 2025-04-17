@@ -1,0 +1,15 @@
+###########################################################################
+### Configuring Cluster                                                 ###
+###########################################################################
+
+- name: ETCD | Configure | Cluster
+  ansible.builtin.import_tasks: configure/cluster.yml
+  tags:
+    - etcd_configure
+    - etcd_configure_cluster
+
+- name: ETCD | Configure | Systemd
+  ansible.builtin.import_tasks: configure/systemd.yml
+  tags:
+    - etcd_configure
+    - etcd_configure_systemd

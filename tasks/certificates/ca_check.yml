@@ -1,0 +1,21 @@
+###########################################################################
+### Check if CA Certificate and Key are Present                         ###
+###########################################################################
+
+- name: ETCD | Certificates | CA | Check if CA Cert Exists
+  ansible.builtin.stat:
+    path: "{{ etcd_pki_dir }}/ca.crt"
+  register: ca_cert_stat
+
+- name: ETCD | Certificates | CA | Check if CA Key Exists
+  ansible.builtin.stat:
+    path: "{{ etcd_pki_dir }}/ca.key"
+  register: ca_key_stat
+
+- name: ETCD | Certificates | CA | Set Flag to Process CA Certificate if Missing or Overwrite is Requested
+  ansible.builtin.set_fact:
+    _etcd_ca_cert_process: >
+      {{
+        (not ca_cert_stat.stat.exists or not ca_key_stat.stat.exists)
+        or etcd_ca_cert_overwrite
+      }}

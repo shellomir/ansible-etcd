@@ -1,0 +1,13 @@
+###########################################################################
+### Creating Users & Groups                                             ###
+###########################################################################
+
+- name: ETCD | Prepare | User
+  ansible.builtin.user:
+    name: "{{ etcd_group }}"
+    state: present
+
+- name: ETCD | Prepare | Group
+  ansible.builtin.group:
+    name: "{{ etcd_group }}"
+    state: present

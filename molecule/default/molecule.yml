@@ -1,0 +1,59 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
+
+platforms:
+  - name: etcd_1
+    image: almalinux:9.3
+    command: /sbin/init
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    pre_build_image: false
+    user: root
+    tmpfs:
+      - /tmp
+    cgroupns_mode: host
+  - name: etcd_2
+    image: almalinux:9.3
+    command: /sbin/init
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    pre_build_image: false
+    user: root
+    tmpfs:
+      - /tmp
+    cgroupns_mode: host
+  - name: etcd_3
+    image: almalinux:9.3
+    command: /sbin/init
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    pre_build_image: false
+    user: root
+    tmpfs:
+      - /tmp
+    cgroupns_mode: host
+
+provisioner:
+  name: ansible
+  log: true
+  playbooks:
+    converge: converge.yml
+  config_options:
+    defaults:
+      strategy: linear
+  env:
+    ANSIBLE_ROLES_PATH: "../../../../roles"
+  inventory:
+    links:
+      group_vars: ../../../../group_vars
+      hosts: inventory.yml
+
+verifier:
+  name: ansible

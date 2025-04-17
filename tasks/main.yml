@@ -1,0 +1,29 @@
+- name: ETCD | Prepare for Installation
+  ansible.builtin.import_tasks: prepare.yml
+  tags:
+    - etcd
+    - etcd_prepare
+
+- name: ETCD | Install
+  ansible.builtin.import_tasks: install.yml
+  tags:
+    - etcd
+    - etcd_install
+
+- name: ETCD | Manage Certificates
+  ansible.builtin.import_tasks: certificates.yml
+  tags:
+    - etcd
+    - etcd_certificates
+
+- name: ETCD | Configure
+  ansible.builtin.import_tasks: configure.yml
+  tags:
+    - etcd
+    - etcd_configure
+
+- name: ETCD | Verify
+  ansible.builtin.import_tasks: verify.yml
+  tags:
+    - etcd
+    - etcd_check

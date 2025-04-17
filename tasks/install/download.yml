@@ -1,0 +1,45 @@
+###########################################################################
+### Download and Extract ETCD Binaries                                  ###
+###########################################################################
+
+- name: ETCD | Install | Check if ETCD is already installed
+  ansible.builtin.stat:
+    path: "{{ etcd_binary_dir }}/etcd"
+  register: etcd_binary
+
+- name: ETCD | Install | Download and Extract Binaries
+  when: not etcd_binary.stat.exists
+  block:
+    - name: ETCD | Install | Download and Extract Binaries | Create Temporary Folder for Download
+      ansible.builtin.file:
+        path: "{{ etcd_download_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: ETCD | Install | Download and Extract Binaries | Download Binaries
+      ansible.builtin.get_url:
+        url: "{{ etcd_download_url }}/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-amd64.tar.gz"
+        dest: "{{ etcd_download_dir }}/etcd.tar.gz"
+        mode: "0755"
+
+    - name: ETCD | Install | Download and Extract Binaries | Extract Binaries
+      ansible.builtin.unarchive:
+        src: "{{ etcd_download_dir }}/etcd.tar.gz"
+        dest: "{{ etcd_binary_dir }}"
+        remote_src: true
+        owner: "{{ etcd_user }}"
+        group: "{{ etcd_group }}"
+        mode: "0774"
+        extra_opts: [--strip-components=1]
+
+    - name: ETCD | Install | Download and Extract Binaries | Cleanup Temporary Folder
+      ansible.builtin.file:
+        path: "{{ etcd_download_dir }}"
+        state: absent
+
+    - name: ETCD | Install | Download and Extract Binaries | Add etcd_binary_dir to System PATH via /etc/profile.d
+      ansible.builtin.copy:
+        dest: /etc/profile.d/etcd.sh
+        content: |
+          export PATH="{{ etcd_binary_dir }}:$PATH"
+        mode: "0644"

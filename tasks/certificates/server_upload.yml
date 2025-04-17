@@ -1,0 +1,15 @@
+###########################################################################
+### Upload Server Certificates                                          ###
+###########################################################################
+
+- name: ETCD | Certificates | Server | Upload | Certificate
+  ansible.builtin.copy:
+    content: "{{ etcd_server_cert | b64decode }}"
+    dest: "{{ etcd_pki_dir }}/server.crt"
+    mode: "0644"
+
+- name: ETCD | Certificates | Server | Upload | Private Key
+  ansible.builtin.copy:
+    content: "{{ etcd_server_private_key | b64decode }}"
+    dest: "{{ etcd_pki_dir }}/server.key"
+    mode: "0600"

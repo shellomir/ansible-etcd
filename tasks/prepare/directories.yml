@@ -1,0 +1,18 @@
+###########################################################################
+### Creating Required Directories                                       ###
+###########################################################################
+
+- name: ETCD | Prepare | Create Required Directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ etcd_user }}"
+    group: "{{ etcd_group }}"
+  loop:
+    - "{{ etcd_binary_dir }}"
+    - "{{ etcd_config_dir }}"
+    - "{{ etcd_data_dir }}"
+    - "{{ etcd_log_dir }}"
+    - "{{ etcd_pki_dir }}"
+    - "{{ etcd_wal_dir }}"

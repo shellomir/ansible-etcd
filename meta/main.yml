@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  author: Alexander Sigachev
+  description: An ansible role to setup ETCD cluster
+  role_name: etcd
+  namespace: shellomir
+
+  license: MIT
+
+  min_ansible_version: 2.18.0
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+  galaxy_tags:
+    - etcd
+    - distributed
+    - cluster
+    - consensus
+    - key-value
+    - high-availability
+dependencies: []
