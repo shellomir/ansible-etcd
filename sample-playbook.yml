@@ -1,0 +1,5 @@
+- name: Deploy ETCD Cluster
+  hosts: etcd_nodes
+  become: true
+  roles:
+    - role: etcd

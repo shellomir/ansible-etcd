@@ -1,0 +1,10 @@
+all:
+  children:
+    etcd_nodes:
+      hosts:
+        etcd-a-1-node:
+          ansible_host: 172.31.0.35
+        etcd-b-1-node:
+          ansible_host: 172.31.16.21
+        etcd-c-1-node:
+          ansible_host: 172.31.32.33
